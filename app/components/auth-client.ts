@@ -1,0 +1,2 @@
+export type AccountUser={id:string;email:string;phone?:string;role:string;firstName:string;lastName:string;profile?:Record<string,unknown>};
+export async function authRequest<T>(action:string,body?:unknown):Promise<T>{const response=await fetch(`/api/auth/${action}`,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});const value=await response.json();if(!response.ok)throw new Error(value.error?.message||'Authentication failed');return value.data;}
