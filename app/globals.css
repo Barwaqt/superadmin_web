@@ -19,3 +19,39 @@
 .brand-loader-label{font-size:12px;color:var(--muted)}
 @keyframes brand-loader-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.brand-loader-ring::before{animation-duration:2.4s}}
+
+/* Branded error screen */
+.error-state{position:relative;display:flex;align-items:center;justify-content:center;min-height:70vh;padding:56px 20px;text-align:center;overflow:hidden;color:var(--ink)}
+.error-state[role=alert],.panel .error-state[role=alert],.modal .error-state[role=alert]{color:var(--ink)}
+.error-state::before{content:'';position:absolute;inset:0;background:radial-gradient(58% 52% at 50% 0%,#e9fbec 0%,rgba(255,255,255,0) 72%);pointer-events:none}
+.error-state-card{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:540px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:44px 34px 34px;box-shadow:0 30px 70px -40px #17232b40}
+.error-state-mark{position:relative;display:grid;place-items:center;width:96px;height:96px;border-radius:28px;background:linear-gradient(160deg,#f4fee9,#e8fbf1);border:1px solid #ddf2e3}
+.error-state-mark::after{content:'';position:absolute;inset:-7px;border-radius:34px;border:1px solid #91df1359}
+.error-state-mark img{width:58px;height:auto}
+.error-state-badge{display:inline-flex;align-items:center;background:#eefadf;color:#3d7a17;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;margin-top:4px}
+.error-state-card h1{font-size:24px;line-height:1.28;letter-spacing:-.5px;color:var(--ink)}
+.error-state-copy{color:var(--muted);font-size:14px;line-height:1.7;max-width:420px}
+.error-state-detail{background:#f6f8f7;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.02em;padding:7px 14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.error-state-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px}
+.error-state-retry{background:#b4ef42;color:#11241a;border:0;border-radius:999px;padding:13px 28px;font-size:13px;font-weight:600;margin:0}
+.error-state-retry:hover{background:#a6e42f}
+.error-state-home{border:1px solid var(--line);border-radius:999px;color:var(--ink);font-size:13px;font-weight:600;padding:13px 24px}
+.error-state-home:hover{background:#f6faf7}
+.error-state-hint{color:var(--muted);font-size:11px;line-height:1.6;margin-top:4px}
+.error-state.panel{min-height:0;padding:18px 4px}
+.error-state.panel::before{display:none}
+.error-state.panel .error-state-card{border:0;box-shadow:none;background:transparent;padding:18px 8px;gap:12px}
+.error-state.panel .error-state-mark{width:68px;height:68px;border-radius:20px}
+.error-state.panel .error-state-mark::after{inset:-5px;border-radius:24px}
+.error-state.panel .error-state-mark img{width:40px}
+.error-state.panel .error-state-card h1{font-size:19px}
+.error-state.panel .error-state-copy{font-size:13px}
+.error-state.inline{min-height:0;padding:0;display:block;text-align:left}
+.error-state.inline::before{display:none}
+.error-state.inline .error-state-card{flex-direction:row;align-items:center;max-width:none;gap:12px;background:#fffdf4;border:1px solid #f2e6c2;border-radius:12px;padding:12px 16px;box-shadow:none}
+.error-state.inline .error-state-mark{width:36px;height:36px;border-radius:11px;background:#fff;border-color:#f0e4c4}
+.error-state.inline .error-state-mark::after{display:none}
+.error-state.inline .error-state-mark img{width:22px}
+.error-state.inline-copy{flex:1;min-width:0;color:#6c5a2a;font-size:13px;line-height:1.5}
+.error-state.inline .error-state-retry{padding:9px 18px;font-size:12px;margin-left:auto}
+@media(max-width:700px){.error-state{padding:32px 14px;min-height:60vh}.error-state-card{padding:34px 20px 26px;border-radius:18px}.error-state-card h1{font-size:20px}.error-state-actions{width:100%;flex-direction:column}.error-state-retry,.error-state-home{width:100%;text-align:center}}
