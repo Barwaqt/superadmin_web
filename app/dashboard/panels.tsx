@@ -9,7 +9,7 @@ import {useAdminUser} from '../components/admin-session';
 import {Icon} from '../components/ui';
 import {BrandLoader} from '../components/brand-loader';
 import {ErrorState} from '../components/error-state';
-import {api,useApi,money,type Product,type ProductPage,type Vendor,type Staff,type StaffPage,type Report,type Shift,type VendorOrder,type AuditLog,type Notice} from '../components/commerce-client';
+import {api,useApi,money,type Product,type ProductPage,type Vendor,type Staff,type StaffPage,type Report,type Shift,type VendorOrder,type OrderDetail,type AuditLog,type Notice} from '../components/commerce-client';
 
 function State({loading,error,retry}:{loading:boolean;error:string;retry:()=>void}){return loading?<BrandLoader label="Loading…"/>:error?<ErrorState variant="panel" message={error} onRetry={retry}/>:null;}
 const slugify=(v:string)=>v.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,180);
@@ -116,11 +116,70 @@ export function Riders(){
 }
 
 /* ------------------------------- Orders ------------------------------- */
+function DetailRow({label,children}:{label:string;children:React.ReactNode}){return <div><dt>{label}</dt><dd style={{whiteSpace:'normal',textAlign:'right'}}>{children}</dd></div>;}
+export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
+ const detail=useApi<OrderDetail>('/orders/'+id);
+ const o=detail.data;
+ const address=o?.order?.address;
+ const customer=o?.order?.customer;
+ const window=o?.order?.deliveryWindow;
+ const itemTotal=o?.items.reduce((n,i)=>n+i.unitPriceMinor*i.quantity,0)||0;
+ return <div className="modal-backdrop" onClick={onClose}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="order-details-title" style={{width:860}} onClick={e=>e.stopPropagation()}><button className="modal-close" aria-label="Close order details" onClick={onClose}>×</button><h2 id="order-details-title"><Icon name="orders"/>Order details</h2><State loading={detail.loading} error={detail.error} retry={detail.reload}/>{o&&<>
+  <p className="muted">Shipment ID: <b>{o.id}</b>{o.order?.id&&<> · Order ID: <b>{o.order.id}</b></>} · Placed {new Date(o.createdAt).toLocaleString()}</p>
+  <p><span className={`status ${statusClass(o.status)}`}>{orderLabels[o.status]||o.status}</span></p>
+  <h3>Customer</h3>
+  <dl className="settlement">
+   <DetailRow label="Name">{customer?`${customer.firstName} ${customer.lastName||''}`.trim():'—'}</DetailRow>
+   <DetailRow label="Email">{customer?.email||'—'}</DetailRow>
+   <DetailRow label="Phone">{customer?.phone||address?.phone||'—'}</DetailRow>
+  </dl>
+  <h3>Delivery location</h3>{address?<dl className="settlement">
+   <DetailRow label="Recipient">{`${address.firstName} ${address.lastName||''}`.trim()||'—'}</DetailRow>
+   <DetailRow label="Contact phone">{address.phone||'—'}</DetailRow>
+   <DetailRow label="Address">{[address.building,address.apartment,address.street].filter(Boolean).join(', ')||'—'}</DetailRow>
+   <DetailRow label="Area / City">{address.zone}, {address.city}</DetailRow>
+   {address.directions&&<DetailRow label="Directions">{address.directions}</DetailRow>}
+   {window&&<DetailRow label="Scheduled slot">{new Date(window.startsAt).toLocaleString()} – {new Date(window.endsAt).toLocaleString()}</DetailRow>}
+   {typeof o.latitude==='number'&&typeof o.longitude==='number'&&<DetailRow label="Rider location"><a href={`https://www.google.com/maps?q=${o.latitude},${o.longitude}`} target="_blank" rel="noreferrer">{o.latitude.toFixed(5)}, {o.longitude.toFixed(5)}</a></DetailRow>}
+  </dl>:<p className="muted">No delivery address on this order.</p>}
+  <h3>Payment</h3>
+  <dl className="settlement">
+   <DetailRow label="Method">{o.order?.paymentMethod||'—'}</DetailRow>
+   <DetailRow label="Payment status">{o.order?.payment?.status||'—'}</DetailRow>
+   <DetailRow label="Shipment total">{money(o.totalMinor)}</DetailRow>
+   <DetailRow label="COD collected">{money(o.codCollectedMinor||0)}{o.cashReceived?' · cash received by platform':''}</DetailRow>
+   {o.deliveredAt&&<DetailRow label="Delivered at">{new Date(o.deliveredAt).toLocaleString()}</DetailRow>}
+  </dl>
+  <h3>Vendor / pickup</h3>
+  <dl className="settlement">
+   <DetailRow label="Store">{o.vendor?.name||'—'}</DetailRow>
+   <DetailRow label="Pickup address">{o.vendor?[o.vendor.address,o.vendor.zone,o.vendor.city].filter(Boolean).join(', '):'—'}</DetailRow>
+   <DetailRow label="Vendor ID">{o.vendorId}</DetailRow>
+  </dl>
+  <h3>Rider</h3>
+  {o.rider?<dl className="settlement"><DetailRow label="Name">{`${o.rider.firstName} ${o.rider.lastName||''}`.trim()}</DetailRow><DetailRow label="Phone">{o.rider.phone||'—'}</DetailRow></dl>:<p className="muted">No rider assigned yet.</p>}
+  <h3>Products ({o.items.length})</h3>
+  <div className="table-scroll"><table><thead><tr><th>Product</th><th>Qty</th><th>Unit price</th><th>Line total</th></tr></thead><tbody>{o.items.map(i=><tr key={i.productId}><td><b>{i.name}</b><div className="muted">Product ID: {i.productId}</div></td><td>{i.quantity}</td><td>{money(i.unitPriceMinor)}</td><td>{money(i.unitPriceMinor*i.quantity)}</td></tr>)}</tbody></table></div>
+  <dl className="settlement">
+   <DetailRow label="Items subtotal">{money(itemTotal)}</DetailRow>
+   <DetailRow label="Discount">{money(o.discountMinor||0)}</DetailRow>
+   <DetailRow label="Delivery fee">{money(o.deliveryMinor||0)}</DetailRow>
+   <DetailRow label="Shipment total">{money(o.totalMinor)}</DetailRow>
+   <DetailRow label="Platform commission">{money(o.commissionMinor||0)}</DetailRow>
+   <DetailRow label="Vendor payable">{money(o.payableMinor||0)}</DetailRow>
+  </dl>
+  {o.failureReason&&<p role="alert">Failure reason: {o.failureReason}</p>}
+  <h3>Status history</h3>
+  <ol style={{paddingLeft:20,display:'grid',gap:8,fontSize:12}}>{o.events.map((e,i)=><li key={i}><b>{orderLabels[e.status]||e.status}</b> · {new Date(e.createdAt).toLocaleString()}{e.note&&<div className="muted">{e.note}</div>}</li>)}</ol>
+  {!o.events.length&&<p className="muted">No status events recorded.</p>}
+ </>}</section></div>;
+}
 export function Orders(){
  const [page,setPage]=useState(1);
  const [status,setStatus]=useState('');
+ const [detailId,setDetailId]=useState<string|null>(null);
  const list=useApi<VendorOrder[]>('/orders?limit=20&page='+page+(status?'&status='+status:''));
- return <section className="panel"><div className="panel-heading"><h2><Icon name="orders"/>Marketplace Orders</h2><div className="heading-actions"><select aria-label="Order status" value={status} onChange={e=>{setStatus(e.target.value);setPage(1);}}><option value="">All statuses</option>{Object.keys(orderLabels).map(v=><option key={v} value={v}>{orderLabels[v]}</option>)}</select><button onClick={list.reload}>Refresh</button></div></div><State loading={list.loading} error={list.error} retry={list.reload}/><div className="table-scroll"><table><thead><tr>{['Order','Vendor','Rider','Total','Status','Created'].map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{list.data?.map(o=><tr key={o.id}><td><b>{o.id}</b>{o.order?.deliveryWindow&&<p>Delivery: {new Date(o.order.deliveryWindow.startsAt).toLocaleString()} – {new Date(o.order.deliveryWindow.endsAt).toLocaleString()}</p>}</td><td className="muted">{o.vendorId}</td><td className="muted">{o.riderId||'—'}</td><td><b>{money(o.totalMinor)}</b></td><td><span className={`status ${statusClass(o.status)}`}>{orderLabels[o.status]||o.status}</span></td><td className="muted">{new Date(o.createdAt).toLocaleString()}</td></tr>)}</tbody></table>{!list.loading&&!list.error&&!list.data?.length&&<p className="empty">No orders found.</p>}</div><div className="live-actions"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}>Previous</button><span>Page {page}</span><button disabled={(list.data?.length||0)<20} onClick={()=>setPage(p=>p+1)}>Next</button></div></section>;
+ return <><section className="panel"><div className="panel-heading"><h2><Icon name="orders"/>Marketplace Orders</h2><div className="heading-actions"><select aria-label="Order status" value={status} onChange={e=>{setStatus(e.target.value);setPage(1);}}><option value="">All statuses</option>{Object.keys(orderLabels).map(v=><option key={v} value={v}>{orderLabels[v]}</option>)}</select><button onClick={list.reload}>Refresh</button></div></div><State loading={list.loading} error={list.error} retry={list.reload}/><div className="table-scroll"><table><thead><tr>{['Order','Vendor','Rider','Total','Status','Created','Actions'].map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{list.data?.map(o=><tr key={o.id}><td><b>{o.id}</b>{o.order?.deliveryWindow&&<p>Delivery: {new Date(o.order.deliveryWindow.startsAt).toLocaleString()} – {new Date(o.order.deliveryWindow.endsAt).toLocaleString()}</p>}</td><td className="muted">{o.vendorId}</td><td className="muted">{o.riderId||'—'}</td><td><b>{money(o.totalMinor)}</b></td><td><span className={`status ${statusClass(o.status)}`}>{orderLabels[o.status]||o.status}</span></td><td className="muted">{new Date(o.createdAt).toLocaleString()}</td><td><button className="mini-button" aria-label={`View details for order ${o.id}`} onClick={()=>setDetailId(o.id)}>View details</button></td></tr>)}</tbody></table>{!list.loading&&!list.error&&!list.data?.length&&<p className="empty">No orders found.</p>}</div><div className="live-actions"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}>Previous</button><span>Page {page}</span><button disabled={(list.data?.length||0)<20} onClick={()=>setPage(p=>p+1)}>Next</button></div></section>{detailId&&<OrderDetails id={detailId} onClose={()=>setDetailId(null)}/>}</>;
 }
 
 /* ------------------------------ Audit log ------------------------------ */
