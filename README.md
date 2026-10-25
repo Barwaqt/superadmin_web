@@ -33,3 +33,5 @@ npm run build
 ## CI/CD and production hosting
 
 Pushes to `main` automatically validate and deploy the admin console to `/var/www/console.barwaqt.com`, using PM2 (`barwaqt-admin`) on port 3002. Follow [Ubuntu, Nginx, HTTPS and GitHub setup](DEPLOYMENT.md) before the first deployment.
+
+Products opens the pending review queue. Open a listing to inspect every image, its full description, specifications, category, price and vendor. Approve after review or reject with a reason shown to the vendor. Listing changes require a new review. Deploy the backend product-moderation migration before this UI.

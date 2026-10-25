@@ -2,14 +2,13 @@
 import {VendorCategoryField,VendorPayoutFields,payoutDraft} from '../components/vendor-onboarding-fields';
 import type {VendorPayout} from '../components/commerce-client';
 import {useEffect,useMemo,useState} from 'react';
-import Image from 'next/image';
 import {useRouter} from 'next/navigation';
 import {authRequest} from '../components/auth-client';
 import {useAdminUser} from '../components/admin-session';
 import {Icon} from '../components/ui';
 import {BrandLoader} from '../components/brand-loader';
 import {ErrorState} from '../components/error-state';
-import {api,useApi,money,type Product,type ProductPage,type Vendor,type Staff,type StaffPage,type Report,type Shift,type VendorOrder,type OrderDetail,type AuditLog,type Notice} from '../components/commerce-client';
+import {api,useApi,money,type Vendor,type Staff,type StaffPage,type Report,type Shift,type VendorOrder,type OrderDetail,type AuditLog,type Notice} from '../components/commerce-client';
 
 function State({loading,error,retry}:{loading:boolean;error:string;retry:()=>void}){return loading?<BrandLoader label="Loading…"/>:error?<ErrorState variant="panel" message={error} onRetry={retry}/>:null;}
 const slugify=(v:string)=>v.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,180);
@@ -69,26 +68,7 @@ export function Vendors(){
 }
 
 /* --------------------------- Vendor products --------------------------- */
-export function PlatformProducts(){
- const vendors=useApi<Vendor[]>('/admin/vendors?limit=100');
- const [vendorId,setVendorId]=useState('');
- const [active,setActive]=useState('');
- const [page,setPage]=useState(1);
- const [searchInput,setSearchInput]=useState('');
- const [search,setSearch]=useState('');
- const [busy,setBusy]=useState(false);
- const [message,setMessage]=useState('');
- useEffect(()=>{const t=setTimeout(()=>{setSearch(searchInput);setPage(1);},350);return()=>clearTimeout(t);},[searchInput]);
- const params=new URLSearchParams({limit:'20',page:String(page)});
- if(vendorId)params.set('vendorId',vendorId);
- if(active)params.set('active',active);
- if(search)params.set('search',search);
- const list=useApi<ProductPage>('/admin/products?'+params.toString());
- const total=list.data?.total||0;
- const lastPage=Math.max(1,Math.ceil(total/20));
- async function toggle(p:Product){setBusy(true);setMessage('');try{await api('/admin/products/'+p.id,'PATCH',{active:!p.active});list.reload();setMessage(p.active?`${p.name} unpublished.`:`${p.name} published.`);}catch(e){setMessage((e as Error).message);}finally{setBusy(false);}}
- return <section className="panel"><div className="panel-heading"><h2><Icon name="box"/>Platform Catalog</h2><button onClick={list.reload}>Refresh</button></div><p className="muted">Products from every vendor, including inactive items and suspended vendors. The public storefront hides these.</p><div className="filter-row"><select aria-label="Choose vendor" value={vendorId} onChange={e=>{setVendorId(e.target.value);setPage(1);}}><option value="">All vendors</option>{vendors.data?.map(v=><option key={v.id} value={v.id}>{v.name} · {v.city}/{v.zone} ({v.status})</option>)}</select><select aria-label="Product status" value={active} onChange={e=>{setActive(e.target.value);setPage(1);}}><option value="">All products</option><option value="true">Active only</option><option value="false">Inactive only</option></select><input aria-label="Search products" placeholder="Search products" value={searchInput} onChange={e=>setSearchInput(e.target.value)}/></div><State loading={vendors.loading} error={vendors.error} retry={vendors.reload}/><p role="status">{message}</p><State loading={list.loading} error={list.error} retry={list.reload}/>{list.data&&<p className="muted">{total} product{total===1?'':'s'} found.</p>}<div className="catalog">{list.data?.items.map(p=><article key={p.id}>{p.images[0]?<Image src={p.images[0]} alt={p.name} width={180} height={120} unoptimized style={{objectFit:'contain'}}/>:<p>No image</p>}<h3>{p.name}</h3><p>{money(p.priceMinor)} · {p.stock} in stock</p><p className="muted">{p.vendor?.name||'Unknown vendor'}{p.vendor?.status?` · ${p.vendor.status}`:''}</p><p className="muted">{p.category?.name||'Uncategorised'}</p><span className={`status ${p.active?'completed':'cancelled'}`}>{p.active?'Active':'Inactive'}</span><div className="live-actions"><button className="mini-button" disabled={busy} onClick={()=>void toggle(p)}>{p.active?'Unpublish':'Publish'}</button></div></article>)}</div>{!list.loading&&!list.error&&!list.data?.items.length&&<p className="empty">No products match these filters.</p>}<div className="live-actions"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}>Previous</button><span>Page {page} of {lastPage}</span><button disabled={page>=lastPage} onClick={()=>setPage(p=>p+1)}>Next</button></div></section>;
-}
+export {ProductReview as PlatformProducts} from './product-review';
 
 /* ------------------------------- Riders ------------------------------- */
 type RiderDraft={email:string;password:string;phone:string;firstName:string;lastName:string};
