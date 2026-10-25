@@ -29,3 +29,7 @@ Administrator accounts are provisioned by the platform (seed `ADMIN_EMAIL`/`ADMI
 npm run lint
 npm run build
 ```
+
+## CI/CD and production hosting
+
+Pushes to `main` automatically validate and deploy the admin console to `/var/www/console.barwaqt.com`, using PM2 (`barwaqt-admin`) on port 3002. Follow [Ubuntu, Nginx, HTTPS and GitHub setup](DEPLOYMENT.md) before the first deployment.
