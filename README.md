@@ -1,4 +1,4 @@
-# Barwaqt Super Admin -- test
+# Barwaqt Super Admin -- portal file
 
 Next.js console for platform administrators (`ADMIN` role). Separate app from the customer storefront (`web`) and vendor portal (`vendor_web`).
 
