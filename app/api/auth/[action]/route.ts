@@ -8,7 +8,7 @@ async function proxy(request:NextRequest,context:{params:Promise<{action:string}
  const {action}=await context.params;
  const allowed=request.method==='GET'?['me','providers']:['login','refresh','logout','forgot-password','reset-password','challenge','social','link-provider','change-password'];
  if(!allowed.includes(action))return NextResponse.json({error:{message:'Route not found'}},{status:404});
- if(request.method!=='GET'&&request.headers.get('origin')!==new URL(request.url).origin)return NextResponse.json({error:{message:'Invalid request origin'}},{status:403});
+ if(request.method!=='GET'&&request.headers.get('origin')!==new URL(process.env.APP_ORIGIN || (process.env.NODE_ENV === "production" ? "https://console.barwaqt.com" : request.url)).origin)return NextResponse.json({error:{message:'Invalid request origin'}},{status:403});
  const store=await cookies();
  const clear=()=>{store.delete(`${prefix}_access`);store.delete(`${prefix}_refresh`);};
  const save=(data:{accessToken:string;refreshToken:string;expiresIn:number})=>{store.set(`${prefix}_access`,data.accessToken,{...options,maxAge:data.expiresIn});store.set(`${prefix}_refresh`,data.refreshToken,{...options,maxAge:30*86400});};

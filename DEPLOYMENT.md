@@ -83,3 +83,7 @@ Every push to main runs lint and a production build. If successful, it uploads t
 The VPS needs writable `/var/www` staging space, enough memory for Next.js builds, and outbound npm/build asset access. Production `NEXT_PUBLIC_*` settings are compiled during the VPS build. `.env*`, `.git` and `uploads/` are preserved. Destination-only files are not deleted, so stale files may need separate cleanup. Git metadata on Ubuntu is not updated; see `.deployed-revision` for the last locally successful deployment commit.
 
 Deployment happens in place with a short restart and no automatic rollback. On failure, inspect Actions and `pm2 logs barwaqt-admin --lines 80 --nostream`. Fix forward or push a reviewed revert. Future releases require no server-side git pull. This workflow does not change the backend, customer website or database.
+
+## Public request origin
+
+Production requests are checked against `https://console.barwaqt.com` for CSRF protection, independently of the internal Nginx URL. For another deployment hostname, set `APP_ORIGIN` to its exact public origin in the frontend production environment file and rebuild/restart. For example, a customer staging deployment uses `APP_ORIGIN=https://stagging.barwaqt.com`. Missing and foreign Origin headers on mutations remain rejected.

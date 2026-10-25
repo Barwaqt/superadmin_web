@@ -9,7 +9,7 @@ async function proxy(req:NextRequest,ctx:{params:Promise<{path:string[]}>}){
  const route='/'+path.join('/');
  const allowed=['payments','delivery','returns','uploads','admin','catalog','vendor','orders','rider','finance','notifications'];
  if(!allowed.includes(path[0]))return NextResponse.json({error:{message:'Route not found'}},{status:404});
- if(req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)return NextResponse.json({error:{message:'Invalid request origin'}},{status:403});
+ if(req.method!=='GET'&&req.headers.get('origin')!==new URL(process.env.APP_ORIGIN || (process.env.NODE_ENV === "production" ? "https://console.barwaqt.com" : req.url)).origin)return NextResponse.json({error:{message:'Invalid request origin'}},{status:403});
  const jar=await cookies();const prefix=`barwaqt_${portal}`;let access=jar.get(prefix+'_access')?.value;
  const opts={httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax' as const,path:'/'};
  async function refresh(){const token=jar.get(prefix+'_refresh')?.value;if(!token)return false;let pending=refreshing.get(token);if(!pending){pending=(async()=>{const r=await fetch(base+'/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:token}),cache:'no-store',signal:AbortSignal.timeout(20000)});return r.ok?(await r.json()).data:null;})();refreshing.set(token,pending);setTimeout(()=>refreshing.delete(token),10000);}const data=await pending;if(!data){jar.delete(prefix+'_access');jar.delete(prefix+'_refresh');return false;}access=data.accessToken;jar.set(prefix+'_access',data.accessToken,{...opts,maxAge:data.expiresIn});jar.set(prefix+'_refresh',data.refreshToken,{...opts,maxAge:30*86400});return true;}
