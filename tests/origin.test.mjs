@@ -13,6 +13,7 @@ for (const kind of ['auth', 'commerce']) {
       require(name) {
         if (name === 'next/server') return { NextResponse: { json: (body, options) => ({ body, ...options }) } };
         if (name === 'next/headers') return { cookies: async () => ({ get: () => undefined, set() {}, delete() {} }) };
+        if (name === '../../../lib/session-refresh') return { refreshSession() { throw Error('Unexpected session refresh in this test'); } };
         throw Error(name);
       }, fetch() { throw Error('Unexpected upstream request'); }
     });
