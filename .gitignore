@@ -5,3 +5,7 @@ out/
 !.env.example
 *.tsbuildinfo
 next-env.d.ts
+
+# Written by scripts/deploy.sh in the deployment directory.
+.deploy.lock
+.deployed-revision
