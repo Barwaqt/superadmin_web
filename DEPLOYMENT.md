@@ -80,28 +80,26 @@ Restrict environment deployment branches to main. Leave required reviewers and w
 
 Every push to main runs lint and a production build. If successful, it uploads the tested revision, installs dependencies and builds in a temporary VPS directory using copies of existing production env files, synchronizes files, restarts PM2, and checks both the local admin site and public HTTPS domain. Pull requests only run CI. Manual workflow runs on main also deploy.
 
-The VPS needs writable `/var/www` staging space, enough memory for Next.js builds, and outbound npm/build asset access. Production `NEXT_PUBLIC_*` settings are compiled during the VPS build. `.env*`, `.git` and `uploads/` are preserved. Destination-only files are not deleted, so stale files may need separate cleanup. Git metadata on Ubuntu is not updated; see `.deployed-revision` for the last locally successful deployment commit.
+The VPS needs writable `/var/www` staging space, enough memory for Next.js builds, and outbound npm/build asset access. Production `NEXT_PUBLIC_*` settings are compiled during the VPS build. `.env*`, `.git` and `uploads/` are preserved. After the health check passes, the deployment also moves the server's Git checkout to the revision it just activated, so `git log` and `git status` on the VPS report what is running. `.deployed-revision` records that revision.
 
 Deployment happens in place with a short restart and no automatic rollback. On failure, inspect Actions and `pm2 logs barwaqt-admin --lines 80 --nostream`. Fix forward or push a reviewed revert. Future releases require no server-side git pull; see the next section to reconcile an existing checkout. This workflow does not change the backend, customer website or database.
 
 ## Server-side Git checkout
 
-`/var/www/console.barwaqt.com` is a deployment target, not a working copy. Deployment synchronizes files but never updates `.git`, so on the VPS `git status` lists the freshly deployed files as local modifications and reports the branch as behind `origin/main`. That is expected and the running app is already current; pulling is not part of deployment.
+`/var/www/console.barwaqt.com` is a deployment target. Deployment synchronizes the built release and then, once the health check passes, aligns the checkout with it (`git fetch --prune origin`, then `git reset --hard <revision>`). A checkout on `main` therefore ends every successful deployment clean and on the revision that is actually running. No server-side `git pull` is needed, and `git status` no longer reports deployed files as local modifications.
 
-To make an existing checkout agree with what is deployed, without changing application files:
+The sync is best effort: it never fails a healthy deployment, it is skipped when the directory is not a Git checkout, and a failed fetch only prints `Warning: cannot fetch origin; Git checkout left unsynced.` These repositories are public, so the deployment account needs no credentials; for a private remote, give that account read access (a token in the remote URL or a read-only deploy key) to keep the checkout synced.
+
+Only tracked files are touched: production env files, `uploads/` and other untracked runtime files are read-only to the sync. Tracked files that the new revision no longer contains are removed, which is how stale sources get cleaned up. `.deploy.lock` and `.deployed-revision` are runtime files written by `scripts/deploy.sh`, are ignored by Git, and must remain on the server.
+
+Never run `git checkout`, `git restore` or `git stash` in this directory: they write older revisions over the deployed files, and the next build or PM2 restart would serve that older code. If a deployment fails before the sync runs, files may already be newer than the checkout; redeploy from Actions, or align it by hand after checking what is on disk:
 
 ```bash
 cd /var/www/console.barwaqt.com
-cat .deployed-revision                        # revision CI last deployed here
 git fetch origin
-git diff --stat "$(cat .deployed-revision)"   # expect no output: disk already matches it
-git reset --hard "$(cat .deployed-revision)"  # use origin/main when the two revisions match
-git status --short                            # clean; ignores the deploy runtime files
+git diff --stat "$(cat .deployed-revision)"   # empty means disk matches the deployed revision
+git reset --hard "$(cat .deployed-revision)"  # only after the diff above is empty
 ```
-
-Run the diff before the reset. If it prints changes, the last deployment did not finish cleanly; redeploy from Actions instead of resetting. Never run `git checkout`, `git restore` or `git stash` in this directory: they roll the deployed files back to the revision recorded in `.git`, and the next PM2 restart would then serve that older code.
-
-`.deploy.lock` and `.deployed-revision` are deployment runtime files written by `scripts/deploy.sh`, are ignored by Git, and must remain on the server.
 
 ## Public request origin
 

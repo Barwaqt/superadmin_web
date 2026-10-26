@@ -18,6 +18,25 @@ for tool in node npm pm2 rsync curl flock; do
 done
 [[ -d "$app_dir" ]]
 pm2 describe "$app_name" >/dev/null
+# Bring the server's Git checkout to the revision that was just deployed, so the
+# deployment account never needs a manual `git pull` and `git log`/`git status`
+# report what is actually running. Best effort: the release is already live and
+# healthy, so a failed fetch warns instead of failing the deployment.
+sync_git_checkout() {
+  [[ -n "${revision:-}" ]] || return 0
+  git -C "$app_dir" rev-parse --git-dir >/dev/null 2>&1 || return 0
+  if ! GIT_TERMINAL_PROMPT=0 timeout 60 git -C "$app_dir" \
+    fetch --quiet --prune origin </dev/null; then
+    echo "Warning: cannot fetch origin; Git checkout left unsynced." >&2
+    return 0
+  fi
+  if git -C "$app_dir" reset --hard --quiet "$revision" </dev/null; then
+    echo "Git checkout synced to $revision"
+  else
+    echo "Warning: cannot move the Git checkout to $revision." >&2
+  fi
+  return 0
+}
 exec 9>"$app_dir/.deploy.lock"
 flock -w 600 9
 stage=$(mktemp -d /var/www/.barwaqt-admin-build.XXXXXXXX)
@@ -45,6 +64,7 @@ pm2 restart "$app_name" --update-env
 for attempt in {1..12}; do
   if curl --fail --silent --show-error --output /dev/null --max-time 10 "http://127.0.0.1:$port/"; then
     printf '%s\n' "$revision" > .deployed-revision
+    sync_git_checkout
     pm2 save
     echo "Admin deployment complete: $revision"
     exit 0
