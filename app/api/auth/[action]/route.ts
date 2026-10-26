@@ -1,3 +1,4 @@
+import {refreshSession} from '../../../lib/session-refresh';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 const api=(process.env.API_URL||'http://localhost:4000/api/v1').replace(/\/$/,'');
@@ -16,8 +17,8 @@ async function proxy(request:NextRequest,context:{params:Promise<{action:string}
  let access=store.get(`${prefix}_access`)?.value;
  const send=(path:string,method:string,body?:unknown,token?:string)=>fetch(`${api}${path}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{}),cache:'no-store',signal:AbortSignal.timeout(20000)});
  const protectedAction=['me','logout','link-provider','change-password'].includes(action);
- async function refresh(){const value=store.get(`${prefix}_refresh`)?.value;if(!value)return false;const r=await send('/auth/refresh','POST',{refreshToken:value});if(!r.ok){clear();return false;}const j=await r.json();save(j.data);access=j.data.accessToken;return true;}
- if(protectedAction&&!access)await refresh();
+ async function refresh(){const value=store.get(`${prefix}_refresh`)?.value;if(!value)return false;const data=await refreshSession(api,value);if(!data){clear();return false;}save(data);access=data.accessToken;return true;}
+ if(protectedAction&&!access&&!await refresh())return NextResponse.json({error:{message:'Sign in required'}},{status:401});
  let body:Record<string,unknown>|undefined;
  if(request.method!=='GET'){try{body=await request.json();}catch{return NextResponse.json({error:{message:'JSON body required'}},{status:422});}}
  if(['forgot-password','social','link-provider'].includes(action))body={...body,portal};
