@@ -39,3 +39,5 @@ Products opens the pending review queue. Open a listing to inspect every image, 
 ## Session and support updates
 
 Use Support in the sidebar to edit vendor help contacts. Under Homepage → Popular Searches, add pinned terms, toggle customer search suggestions, and set Maximum homepage search tags (1–100). Publish to apply.
+
+Coupon creation and editing require one or more category checkboxes. Only matching primary product categories contribute to the discount and minimum subtotal; select child categories individually. Existing coupons need categories selected before redemption.
