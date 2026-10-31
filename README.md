@@ -41,3 +41,7 @@ Products opens the pending review queue. Open a listing to inspect every image, 
 Use Support in the sidebar to edit vendor help contacts. Under Homepage → Popular Searches, add pinned terms, toggle customer search suggestions, and set Maximum homepage search tags (1–100). Publish to apply.
 
 Coupon creation and editing require one or more category checkboxes. Only matching primary product categories contribute to the discount and minimum subtotal; select child categories individually. Existing coupons need categories selected before redemption.
+
+### SMS and WhatsApp marketing
+
+The Marketing sidebar page queues campaigns through Veevo. It supports SMS text and approved text-only WhatsApp templates, up to 100 recipient numbers, duplicate prevention, and per-recipient submission status. Configure provider credentials only on the API server; see `server/docs/VEEVO_SETUP.md` in the backend project. A dummy key leaves Send disabled. ACCEPTED is provider acknowledgement, not confirmed delivery.
