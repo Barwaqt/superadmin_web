@@ -58,17 +58,15 @@ export function Marketing() {
   }, [reload]);
 
   // Phone Book / Contacts state
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  useEffect(() => {
+  const [contacts, setContacts] = useState<Contact[]>(() => {
+    if (typeof window === 'undefined') return [];
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setContacts(JSON.parse(saved));
-      }
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      // ignore
+      return [];
     }
-  }, []);
+  });
 
   const saveContacts = (updated: Contact[]) => {
     setContacts(updated);
