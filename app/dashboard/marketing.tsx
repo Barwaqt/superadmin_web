@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { api, useApi } from '../components/commerce-client';
 import { Icon } from '../components/ui';
 
@@ -50,12 +50,13 @@ export function Marketing() {
   );
   const history = useApi<Campaign[]>('/admin/marketing/campaigns');
   const reload = history.reload;
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Poll for status updates
-  useEffect(() => {
-    const timer = setInterval(reload, 5000);
-    return () => clearInterval(timer);
-  }, [reload]);
+  const handleManualRefresh = () => {
+    setRefreshing(true);
+    reload();
+    setTimeout(() => setRefreshing(false), 600);
+  };
 
   // Phone Book / Contacts state
   const [contacts, setContacts] = useState<Contact[]>(() => {
@@ -407,11 +408,35 @@ export function Marketing() {
             <button
               type="button"
               className="mini-button"
-              style={{ padding: '9px 14px' }}
-              onClick={reload}
-              title="Refresh campaigns"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '9px 14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              title="Refresh campaigns and stats"
             >
-              Refresh
+              <svg
+                width={15}
+                height={15}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  transition: 'transform 0.5s ease',
+                  transform: refreshing ? 'rotate(360deg)' : 'none',
+                }}
+              >
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+              </svg>
+              {refreshing ? 'Refreshing...' : 'Refresh'}
             </button>
           </div>
         </div>
