@@ -124,7 +124,6 @@ export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
    {window&&<DetailRow label="Scheduled slot">{new Date(window.startsAt).toLocaleString()} – {new Date(window.endsAt).toLocaleString()}</DetailRow>}
    {typeof o.latitude==='number'&&typeof o.longitude==='number'&&<DetailRow label="Rider location"><a href={`https://www.google.com/maps?q=${o.latitude},${o.longitude}`} target="_blank" rel="noreferrer">{o.latitude.toFixed(5)}, {o.longitude.toFixed(5)}</a></DetailRow>}
   </dl>:<p className="muted">No delivery address on this order.</p>}
-  {o.proofImage&&<><h3>Delivery proof</h3><a href={o.proofImage} target="_blank" rel="noreferrer"><Image src={o.proofImage} alt={`Drop-off photo captured by the rider for order ${o.id}`} width={420} height={280} unoptimized style={{width:'100%',maxWidth:420,height:'auto',borderRadius:12,border:'1px solid #e8eef3'}}/></a><p className="muted">Photo captured by the rider at handover. Select it to open the full image.</p></>}
   <h3>Payment</h3>
   <dl className="settlement">
    <DetailRow label="Method">{o.order?.paymentMethod||'—'}</DetailRow>
@@ -155,6 +154,7 @@ export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
   <h3>Status history</h3>
   <ol style={{paddingLeft:20,display:'grid',gap:8,fontSize:12}}>{o.events.map((e,i)=><li key={i}><b>{orderLabels[e.status]||e.status}</b> · {new Date(e.createdAt).toLocaleString()}{e.note&&<div className="muted">{e.note}</div>}</li>)}</ol>
   {!o.events.length&&<p className="muted">No status events recorded.</p>}
+  {o.proofImage&&<><h3>Delivery photo</h3><p className="muted">Uploaded by the rider when the order was delivered.</p><a href={o.proofImage} target="_blank" rel="noreferrer"><Image src={o.proofImage} unoptimized alt="Delivery photo uploaded by the rider" width={640} height={480} style={{display:'block',width:'100%',maxWidth:640,height:'auto',borderRadius:14,border:'1px solid #d6e2da',marginTop:8}}/></a></>}
  </>}</section></div>;
 }
 export function Orders(){
