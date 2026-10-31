@@ -381,8 +381,8 @@ export function Marketing() {
                 setShowCreateModal(true);
               }}
             >
-              <Icon name="bell" size={17} />
-              + Create Campaign
+              <Icon name="plus" size={17} />
+              Create Campaign
             </button>
 
             <button
@@ -543,10 +543,11 @@ export function Marketing() {
             <button
               type="button"
               className="primary"
-              style={{ marginTop: 8 }}
+              style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}
               onClick={() => setShowCreateModal(true)}
             >
-              + Create Your First Campaign
+              <Icon name="plus" size={16} />
+              Create Your First Campaign
             </button>
           </div>
         ) : (
@@ -666,7 +667,7 @@ export function Marketing() {
               ×
             </button>
             <h2 id="campaign-modal-title" style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 16px' }}>
-              <Icon name="bell" size={24} />
+              <Icon name="send" size={22} />
               Create Marketing Campaign
             </h2>
 
@@ -756,12 +757,13 @@ export function Marketing() {
                         <button
                           type="button"
                           className="primary"
-                          style={{ marginTop: 10, fontSize: 12, padding: '6px 14px' }}
+                          style={{ marginTop: 10, fontSize: 12, padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
                           onClick={() => {
                             setShowPhoneBookModal(true);
                           }}
                         >
-                          + Add Numbers to Phone Book
+                          <Icon name="plus" size={14} />
+                          Add Numbers to Phone Book
                         </button>
                       </div>
                     ) : (
@@ -950,9 +952,10 @@ export function Marketing() {
                   type="submit"
                   className="primary"
                   disabled={busy || (!sms && !whatsapp) || (sms && !config.data?.smsConfigured)}
-                  style={{ minWidth: 160 }}
+                  style={{ minWidth: 160, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                 >
-                  {busy ? 'Queuing Campaign...' : '🚀 Send Campaign'}
+                  <Icon name="send" size={16} />
+                  {busy ? 'Queuing Campaign...' : 'Send Campaign'}
                 </button>
               </div>
             </form>
@@ -984,9 +987,18 @@ export function Marketing() {
                 className="mini-button"
                 disabled={importingCustomers}
                 onClick={handleImportCustomers}
-                style={{ background: '#e0f2fe', color: '#0369a1', borderColor: '#bae6fd', fontWeight: 600 }}
+                style={{
+                  background: '#e0f2fe',
+                  color: '#0369a1',
+                  borderColor: '#bae6fd',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
               >
-                {importingCustomers ? 'Importing...' : '📥 Import from Customers'}
+                <Icon name="download" size={15} />
+                {importingCustomers ? 'Importing...' : 'Import from Customers'}
               </button>
             </div>
 
@@ -1001,10 +1013,14 @@ export function Marketing() {
                   border: '1px solid #cbd5e1',
                   background: phoneBookTab === 'single' ? '#0f172a' : '#fff',
                   color: phoneBookTab === 'single' ? '#fff' : '#0f172a',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
                 onClick={() => setPhoneBookTab('single')}
               >
-                + Add Single Contact
+                <Icon name="plus" size={13} />
+                Add Single Contact
               </button>
               <button
                 type="button"
@@ -1015,10 +1031,14 @@ export function Marketing() {
                   border: '1px solid #cbd5e1',
                   background: phoneBookTab === 'bulk' ? '#0f172a' : '#fff',
                   color: phoneBookTab === 'bulk' ? '#fff' : '#0f172a',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
                 onClick={() => setPhoneBookTab('bulk')}
               >
-                + Bulk Paste Numbers
+                <Icon name="upload" size={13} />
+                Bulk Paste Numbers
               </button>
             </div>
 
