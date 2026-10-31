@@ -1,5 +1,6 @@
 'use client';
 import PasswordInput from '../components/password-input';
+import Image from 'next/image';
 import {VendorCategoryField,VendorPayoutFields,payoutDraft} from '../components/vendor-onboarding-fields';
 import type {VendorPayout} from '../components/commerce-client';
 import {useEffect,useMemo,useState} from 'react';
@@ -123,6 +124,7 @@ export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
    {window&&<DetailRow label="Scheduled slot">{new Date(window.startsAt).toLocaleString()} – {new Date(window.endsAt).toLocaleString()}</DetailRow>}
    {typeof o.latitude==='number'&&typeof o.longitude==='number'&&<DetailRow label="Rider location"><a href={`https://www.google.com/maps?q=${o.latitude},${o.longitude}`} target="_blank" rel="noreferrer">{o.latitude.toFixed(5)}, {o.longitude.toFixed(5)}</a></DetailRow>}
   </dl>:<p className="muted">No delivery address on this order.</p>}
+  {o.proofImage&&<><h3>Delivery proof</h3><a href={o.proofImage} target="_blank" rel="noreferrer"><Image src={o.proofImage} alt={`Drop-off photo captured by the rider for order ${o.id}`} width={420} height={280} unoptimized style={{width:'100%',maxWidth:420,height:'auto',borderRadius:12,border:'1px solid #e8eef3'}}/></a><p className="muted">Photo captured by the rider at handover. Select it to open the full image.</p></>}
   <h3>Payment</h3>
   <dl className="settlement">
    <DetailRow label="Method">{o.order?.paymentMethod||'—'}</DetailRow>
