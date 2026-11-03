@@ -7,7 +7,7 @@ async function proxy(req:NextRequest,ctx:{params:Promise<{path:string[]}>}){
  const {path}=await ctx.params;
  if(path.some(p=>!p||p==='.'||p==='..'||!/^[a-zA-Z0-9_-]+$/.test(p)))return NextResponse.json({error:{message:'Invalid path'}},{status:400});
  const route='/'+path.join('/');
- const allowed=['payments','delivery','returns','uploads','admin','catalog','vendor','orders','rider','finance','notifications'];
+ const allowed=['payments','delivery','returns','uploads','admin','catalog','vendor','orders','rider','finance','notifications','maps'];
  if(!allowed.includes(path[0]))return NextResponse.json({error:{message:'Route not found'}},{status:404});
  if(req.method!=='GET'&&req.headers.get('origin')!==new URL(process.env.APP_ORIGIN || (process.env.NODE_ENV === "production" ? "https://console.barwaqt.com" : req.url)).origin)return NextResponse.json({error:{message:'Invalid request origin'}},{status:403});
  const jar=await cookies();const prefix=`barwaqt_${portal}`;let access=jar.get(prefix+'_access')?.value;
