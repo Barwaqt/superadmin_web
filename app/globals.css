@@ -68,9 +68,9 @@
 .location-detect-heading b{font-size:12px;color:#315b42}
 .location-detect-hint{margin:0;font-size:11px;line-height:1.5;color:#7d8b80}
 .location-detect .mini-button{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:6px 10px;background:#e5eef7;color:#33475a}
-.location-detect form{display:flex;gap:8px;align-items:stretch}
-.location-detect form input{margin:0;flex:1;min-width:0}
-.location-detect form button{border:0;border-radius:7px;background:#4add1b;color:#133014;font-weight:600;padding:0 16px;min-height:42px;font-size:12px}
+.location-detect form,.location-detect .location-search{display:flex;gap:8px;align-items:stretch}
+.location-detect form input,.location-detect .location-search input{margin:0;flex:1;min-width:0}
+.location-detect form button,.location-detect .location-search button{border:0;border-radius:7px;background:#4add1b;color:#133014;font-weight:600;padding:0 16px;min-height:42px;font-size:12px}
 .location-results{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:220px;overflow:auto}
 .location-results button{width:100%;text-align:left;background:#fff;border:1px solid #dfe8dd;border-radius:9px;padding:9px 12px;display:grid;gap:2px;min-height:0}
 .location-results button:hover{background:#effbe9}
@@ -78,4 +78,4 @@
 .location-results small{color:#7d8b80;font-size:11px;line-height:1.4;overflow-wrap:anywhere}
 .location-detect [role=status]{margin:0;font-size:11px;line-height:1.5;color:#4d6b57}
 .location-detect [role=status]:empty{display:none}
-@media(max-width:700px){.location-detect form{flex-direction:column}.location-detect form button{width:100%}}
+@media(max-width:700px){.location-detect form,.location-detect .location-search{flex-direction:column}.location-detect form button,.location-detect .location-search button{width:100%}}

@@ -24,7 +24,8 @@ export function VendorLocationFields({value,onChange}:{value:VendorLocation;onCh
     });
     setResults([]);
     setQuery('');
-    setMessage(`Service area filled from ${source}. Review the fields and save.`);
+    const missing=(['city','zone'] as const).filter(field=>!clean(next[field]));
+    setMessage(`Service area filled from ${source}.${missing.length?` Confirm the ${missing.join(' and ')} field${missing.length>1?'s':''} below.`:''} Review and save.`);
   }
 
   async function pick(placeId:string){
@@ -53,8 +54,8 @@ export function VendorLocationFields({value,onChange}:{value:VendorLocation;onCh
     },()=>{setBusy('');setMessage('Location permission was denied. Search for the store area instead.');},{enableHighAccuracy:true,timeout:10000});
   }
 
-  async function search(event:React.FormEvent){
-    event.preventDefault();
+  async function search(){
+    if(busy||query.trim().length<3)return;
     setBusy('search');
     setMessage('');
     try{
@@ -78,10 +79,10 @@ export function VendorLocationFields({value,onChange}:{value:VendorLocation;onCh
         <button type="button" className="mini-button" disabled={!!busy} onClick={locate}>{busy==='gps'?'Detecting…':'⌖ Use current location'}</button>
       </div>
       <p className="location-detect-hint">Search and pick a place to fill the fields above, or type the address, city, and zone manually. Customers in this city and zone see the vendor at checkout.</p>
-      <form onSubmit={search}>
-        <input aria-label="Search store location" placeholder="Search area, market, or landmark" maxLength={120} value={query} onChange={event=>setQuery(event.target.value)}/>
-        <button type="submit" disabled={!!busy||query.trim().length<3}>{busy==='search'?'Searching…':'Search'}</button>
-      </form>
+      <div className="location-search">
+        <input aria-label="Search store location" placeholder="Search area, market, or landmark" maxLength={120} value={query} onChange={event=>setQuery(event.target.value)} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();event.stopPropagation();void search();}}}/>
+        <button type="button" disabled={!!busy||query.trim().length<3} onClick={()=>void search()}>{busy==='search'?'Searching…':'Search'}</button>
+      </div>
       {results.length>0&&<ul className="location-results">{results.map(place=><li key={place.placeId}><button type="button" disabled={!!busy} onClick={()=>void pick(place.placeId)}><b>{place.mainText}</b><small>{place.secondaryText}</small></button></li>)}</ul>}
       <p role="status">{message}</p>
     </div>

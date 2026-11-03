@@ -2,7 +2,8 @@
 import {useEffect,useState,useCallback} from 'react';
 import type {AccountUser} from './auth-client';
 export class ApiError extends Error {constructor(message:string,public status:number){super(message);}}
-export async function api<T>(path:string,method='GET',body?:unknown,key?:string):Promise<T>{const r=await fetch('/api/commerce'+path,{method,headers:{'Content-Type':'application/json',...(key?{'Idempotency-Key':key}:{})},...(body===undefined?{}:{body:JSON.stringify(body)}),cache:'no-store'});if(r.status===204)return undefined as T;const j=await r.json();if(!r.ok)throw new ApiError(j.error?.message||'Request failed',r.status);return j.data;}
+export async function api<T>(path:string,method='GET',body?:unknown,key?:string):Promise<T>{const r=await fetch('/api/commerce'+path,{method,headers:{'Content-Type':'application/json',...(key?{'Idempotency-Key':key}:{})},...(body===undefined?{}:{body:JSON.stringify(body)}),cache:'no-store'});if(r.status===204)return undefined as T;const j=await r.json();if(!r.ok)throw new ApiError(apiErrorMessage(j),r.status);return j.data;}
+function apiErrorMessage(payload:{error?:{message?:string;details?:{path?:string;message?:string}[]}}){const message=payload.error?.message||'Request failed';const details=(payload.error?.details||[]).map(d=>d.path?`${d.path}: ${d.message}`:d.message).filter(Boolean);return details.length?`${message} — ${details.join('; ')}`:message;}
 export function useApi<T>(path:string|null){
  const [version,setVersion]=useState(0);
  const key=String(path)+':'+version;
