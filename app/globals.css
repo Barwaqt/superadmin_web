@@ -79,3 +79,7 @@
 .location-detect [role=status]{margin:0;font-size:11px;line-height:1.5;color:#4d6b57}
 .location-detect [role=status]:empty{display:none}
 @media(max-width:700px){.location-detect form,.location-detect .location-search{flex-direction:column}.location-detect form button,.location-detect .location-search button{width:100%}}
+.nav-badge{margin-left:auto;background:#e02424;color:#fff;border-radius:999px;font-size:10px;font-weight:700;min-width:18px;height:18px;padding:0 5px;display:grid;place-items:center;line-height:1}
+.sidebar nav button[aria-current] .nav-badge{background:#13240c}
+.bell-wrap{position:relative}
+.bell-badge{position:absolute;top:-6px;right:-8px;background:#e02424;color:#fff;border-radius:999px;font-size:9px;font-weight:700;min-width:16px;height:16px;padding:0 4px;display:grid;place-items:center;line-height:1}
