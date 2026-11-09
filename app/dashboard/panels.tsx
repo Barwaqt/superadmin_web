@@ -138,6 +138,7 @@ export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
    <DetailRow label="Area / City">{address.zone}, {address.city}</DetailRow>
    {address.directions&&<DetailRow label="Directions">{address.directions}</DetailRow>}
    {window&&<DetailRow label="Scheduled slot">{new Date(window.startsAt).toLocaleString()} – {new Date(window.endsAt).toLocaleString()}</DetailRow>}
+   <DetailRow label="Delivery location">{typeof address?.latitude==='number'&&typeof address?.longitude==='number'?<a href={`https://www.google.com/maps?q=${address.latitude},${address.longitude}`} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>:<span className="muted">No exact pin saved — text address only</span>}</DetailRow>
    {typeof o.latitude==='number'&&typeof o.longitude==='number'&&<DetailRow label="Rider location"><a href={`https://www.google.com/maps?q=${o.latitude},${o.longitude}`} target="_blank" rel="noreferrer">{o.latitude.toFixed(5)}, {o.longitude.toFixed(5)}</a></DetailRow>}
   </dl>:<p className="muted">No delivery address on this order.</p>}
   <h3>Payment</h3>
