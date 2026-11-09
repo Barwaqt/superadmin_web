@@ -83,3 +83,6 @@
 .sidebar nav button[aria-current] .nav-badge{background:#13240c}
 .bell-wrap{position:relative}
 .bell-badge{position:absolute;top:-6px;right:-8px;background:#e02424;color:#fff;border-radius:999px;font-size:9px;font-weight:700;min-width:16px;height:16px;padding:0 4px;display:grid;place-items:center;line-height:1}
+.product-link{background:none;border:0;padding:0;color:#0a7a3d;font:inherit;text-align:left;cursor:pointer}
+.product-link:hover{text-decoration:underline}
+.product-link b{color:inherit}

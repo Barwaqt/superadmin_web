@@ -107,6 +107,13 @@ export function Riders(){
 
 /* ------------------------------- Orders ------------------------------- */
 function DetailRow({label,children}:{label:string;children:React.ReactNode}){return <div><dt>{label}</dt><dd style={{whiteSpace:'normal',textAlign:'right'}}>{children}</dd></div>;}
+type FullProduct={id:string;name:string;description:string;priceMinor:number;stock:number;active:boolean;images:string[];attributes:Record<string,string>;category?:{name:string};vendor?:{name:string;city:string;zone:string};reviews?:{rating:number;comment:string;createdAt:string}[]};
+function ProductDetails({productId,onClose}:{productId:string;onClose:()=>void}){
+ const [data,setData]=useState<FullProduct|null>(null);const [error,setError]=useState('');
+ useEffect(()=>{let live=true;api<FullProduct>('/catalog/products/'+productId).then(d=>{if(live)setData(d);}).catch(()=>{if(live)setError('This product is no longer published.');});return ()=>{live=false;};},[productId]);
+ const img=data?.images?.[0];
+ return <div className="modal-backdrop" onClick={onClose} style={{zIndex:200}}><section className="modal" role="dialog" aria-modal="true" aria-label="Product details" style={{width:560,maxHeight:'90dvh',overflow:'auto'}} onClick={e=>e.stopPropagation()}><button className="modal-close" aria-label="Close product details" onClick={onClose}>×</button>{!data&&!error&&<p>Loading product details…</p>}{error&&<p className="muted">{error}</p>}{data&&<><h2 style={{fontSize:20}}>{data.name}</h2>{img&&<Image src={img} unoptimized alt={data.name} width={520} height={340} style={{width:'100%',height:'auto',objectFit:'contain',borderRadius:12}}/>}<p><b>{money(data.priceMinor)}</b> · {data.stock} in stock · {data.active?'Published':'Unpublished'}</p>{data.description&&<p className="muted">{data.description}</p>}{data.category&&<p className="muted">Category: {data.category.name}</p>}{data.vendor&&<p className="muted">Vendor: {data.vendor.name} · {data.vendor.zone}, {data.vendor.city}</p>}{Object.keys(data.attributes||{}).length>0&&<dl className="settlement">{Object.entries(data.attributes).map(([k,v])=><div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}{data.reviews&&data.reviews.length>0&&<><h3>Recent reviews</h3>{data.reviews.slice(0,5).map((r,i)=><p key={i} className="muted">★ {r.rating} — {r.comment}</p>)}</>}</>}<p className="muted" style={{fontSize:11}}>Product ID: {productId}</p></section></div>;
+}
 export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
  const detail=useApi<OrderDetail>('/orders/'+id);
  const o=detail.data;
@@ -114,6 +121,7 @@ export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
  const customer=o?.order?.customer;
  const window=o?.order?.deliveryWindow;
  const itemTotal=o?.items.reduce((n,i)=>n+i.unitPriceMinor*i.quantity,0)||0;
+ const [selectedProduct,setSelectedProduct]=useState<string|null>(null);
  return <div className="modal-backdrop" onClick={onClose}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="order-details-title" style={{width:860}} onClick={e=>e.stopPropagation()}><button className="modal-close" aria-label="Close order details" onClick={onClose}>×</button><h2 id="order-details-title"><Icon name="orders"/>Order details</h2><State loading={detail.loading} error={detail.error} retry={detail.reload}/>{o&&<>
   <p className="muted">Shipment ID: <b>{o.id}</b>{o.order?.id&&<> · Order ID: <b>{o.order.id}</b></>} · Placed {new Date(o.createdAt).toLocaleString()}</p>
   <p><span className={`status ${statusClass(o.status)}`}>{orderLabels[o.status]||o.status}</span>{o.order?.isWspan&&<span className="status cancelled" style={{marginLeft:8}}>WSPAN · {o.order?.cancelledShipments||0} prior cancellations — verify before dispatch</span>}</p>
@@ -149,7 +157,7 @@ export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
   <h3>Rider</h3>
   {o.rider?<dl className="settlement"><DetailRow label="Name">{`${o.rider.firstName} ${o.rider.lastName||''}`.trim()}</DetailRow><DetailRow label="Phone">{o.rider.phone||'—'}</DetailRow></dl>:<p className="muted">No rider assigned yet.</p>}
   <h3>Products ({o.items.length})</h3>
-  <div className="table-scroll"><table><thead><tr><th>Product</th><th>Qty</th><th>Unit price</th><th>Line total</th></tr></thead><tbody>{o.items.map(i=><tr key={i.productId}><td><b>{i.name}</b><div className="muted">Product ID: {i.productId}</div></td><td>{i.quantity}</td><td>{money(i.unitPriceMinor)}</td><td>{money(i.unitPriceMinor*i.quantity)}</td></tr>)}</tbody></table></div>
+  <div className="table-scroll"><table><thead><tr><th>Product</th><th>Qty</th><th>Unit price</th><th>Line total</th></tr></thead><tbody>{o.items.map(i=><tr key={i.productId}><td>{i.image&&<Image src={i.image} unoptimized alt={i.name} width={48} height={48} style={{borderRadius:8,verticalAlign:'middle',marginRight:8}}/>}<button type="button" className="product-link" onClick={()=>setSelectedProduct(i.productId)} title="View product details"><b>{i.name}</b></button><div className="muted">Product ID: {i.productId}</div></td><td>{i.quantity}</td><td>{money(i.unitPriceMinor)}</td><td>{money(i.unitPriceMinor*i.quantity)}</td></tr>)}</tbody></table></div>
   <dl className="settlement">
    <DetailRow label="Items subtotal">{money(itemTotal)}</DetailRow>
    <DetailRow label="Discount">{money(o.discountMinor||0)}</DetailRow>
@@ -163,7 +171,7 @@ export function OrderDetails({id,onClose}:{id:string;onClose:()=>void}){
   <ol style={{paddingLeft:20,display:'grid',gap:8,fontSize:12}}>{o.events.map((e,i)=><li key={i}><b>{orderLabels[e.status]||e.status}</b> · {new Date(e.createdAt).toLocaleString()}{e.note&&<div className="muted">{e.note}</div>}</li>)}</ol>
   {!o.events.length&&<p className="muted">No status events recorded.</p>}
   {o.proofImage&&<><h3>Delivery photo</h3><p className="muted">Uploaded by the rider when the order was delivered.</p><a href={o.proofImage} target="_blank" rel="noreferrer"><Image src={o.proofImage} unoptimized alt="Delivery photo uploaded by the rider" width={640} height={480} style={{display:'block',width:'100%',maxWidth:640,height:'auto',borderRadius:14,border:'1px solid #d6e2da',marginTop:8}}/></a></>}
- </>}</section></div>;
+ </>}{selectedProduct&&o&&<ProductDetails productId={selectedProduct} onClose={()=>setSelectedProduct(null)}/>}</section></div>;
 }
 export function Orders(){
  const [page,setPage]=useState(1);
