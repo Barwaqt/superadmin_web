@@ -32,7 +32,7 @@ export function VendorLocationFields({value,onChange}:{value:VendorLocation;onCh
         if(!places.length)setMessage('No places found. Try a landmark, market, or area name.');
       }catch(e){if(live)setMessage((e as Error).message);}
       finally{if(live)setSearching(false);}
-    },350);
+    },200);
     return ()=>{live=false;clearTimeout(timer);};
   },[query]);
 
@@ -81,6 +81,7 @@ export function VendorLocationFields({value,onChange}:{value:VendorLocation;onCh
       <label>City<input required maxLength={200} autoComplete="address-level2" value={value.city} onChange={event=>onChange({...value,city:event.target.value})}/></label>
       <label>Zone / Area<input required maxLength={200} autoComplete="address-level3" value={value.zone} onChange={event=>onChange({...value,zone:event.target.value})}/></label>
     </div>
+    <p className="muted" style={{marginTop:6}}>Type 3+ characters to see matching market, landmark or area names.</p>
     <div className="location-detect">
       <div className="location-detect-heading">
         <b>Detect from Google Maps</b>
