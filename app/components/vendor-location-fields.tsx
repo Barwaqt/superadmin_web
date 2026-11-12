@@ -20,7 +20,7 @@ export function VendorLocationFields({value,onChange}:{value:VendorLocation;onCh
   // Suggest matching places as soon as the admin types, without a Search click.
   useEffect(()=>{
     const term=query.trim();
-    if(term.length<3){setResults([]);setSearching(false);return;}
+    if(term.length<3)return;
     let live=true;
     const timer=setTimeout(async()=>{
       setSearching(true);
@@ -91,7 +91,7 @@ export function VendorLocationFields({value,onChange}:{value:VendorLocation;onCh
       <div className="location-search">
         <input aria-label="Search store location" placeholder="Type an area, market, or landmark" maxLength={120} value={query} onChange={event=>setQuery(event.target.value)} onKeyDown={event=>{if(event.key==='Enter'){event.preventDefault();event.stopPropagation();const first=results[0];if(first&&!busy)void pick(first.placeId);}}}/>
       </div>
-      {results.length>0&&<ul className="location-results" role="listbox" aria-label="Matching places">{results.map(place=><li key={place.placeId}><button type="button" role="option" disabled={!!busy} onClick={()=>void pick(place.placeId)}><b>{place.mainText}</b><small>{place.secondaryText}</small></button></li>)}</ul>}
+      {results.length>0&&<ul className="location-results" role="listbox" aria-label="Matching places">{results.map(place=><li key={place.placeId}><button type="button" role="option" aria-selected={false} disabled={!!busy} onClick={()=>void pick(place.placeId)}><b>{place.mainText}</b><small>{place.secondaryText}</small></button></li>)}</ul>}
       <p role="status">{searching?'Searching…':message}</p>
     </div>
   </fieldset>;
