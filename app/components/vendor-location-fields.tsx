@@ -5,24 +5,6 @@ import {api} from './commerce-client';
 
 export type VendorLocation={address:string;city:string;zone:string};
 
-export type VendorDelivery={expressDelivery:boolean;expressEtaMinutes:number|null;standardDeliveryDays:number};
-
-// Express promises are stored in minutes; the admin picks from these windows.
-const expressWindows:[number,string][]=[[30,'30 minutes'],[60,'1 hour'],[120,'2 hours'],[180,'3 hours'],[240,'4 hours'],[480,'8 hours'],[720,'12 hours'],[1440,'24 hours']];
-
-export function VendorDeliveryFields({value,onChange}:{value:VendorDelivery;onChange:(next:VendorDelivery)=>void}) {
-  const standardDays=Math.min(7,Math.max(1,value.standardDeliveryDays||7));
-  return <fieldset>
-    <legend>Delivery options</legend>
-    <div className="form-grid">
-      <label>Standard delivery<select value={standardDays} onChange={event=>onChange({...value,standardDeliveryDays:Number(event.target.value)})}>{[1,2,3,4,5,6,7].map(days=><option key={days} value={days}>Within {days} day{days===1?'':'s'}</option>)}</select></label>
-      <label>Express delivery<select value={value.expressDelivery?'on':'off'} onChange={event=>onChange({...value,expressDelivery:event.target.value==='on',expressEtaMinutes:event.target.value==='on'?(value.expressEtaMinutes||120):value.expressEtaMinutes})}><option value="off">Not offered</option><option value="on">Offered</option></select></label>
-      {value.expressDelivery&&<label>Express delivery time<select value={value.expressEtaMinutes||120} onChange={event=>onChange({...value,expressEtaMinutes:Number(event.target.value)})}>{expressWindows.map(([minutes,label])=><option key={minutes} value={minutes}>Within {label}</option>)}</select></label>}
-    </div>
-    <p className="muted" style={{marginTop:6}}>Customers pick one option at checkout. Express is only offered when every store in the basket supports it, so keep it off unless this store can commit to the time.</p>
-  </fieldset>;
-}
-
 type Place={placeId:string;mainText:string;secondaryText?:string};
 type PlaceDetails={formattedAddress?:string;name?:string;street?:string;city?:string;zone?:string};
 
