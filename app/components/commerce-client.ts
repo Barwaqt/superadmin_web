@@ -13,7 +13,8 @@ export function useApi<T>(path:string|null){
  return {data:result?.key===key?result.data:undefined,error:result?.key===key?result.error:'',loading:!!path&&result?.key!==key,reload};
 }
 export type Category={commissionBps:number;id:string;name:string;slug:string;image?:string|null;parentSlug?:string|null};
-export type Product={reviewStatus:"PENDING"|"APPROVED"|"REJECTED";rejectionReason:string|null;reviewVersion:number;reviewedAt?:string|null;id:string;name:string;slug:string;description:string;priceMinor:number;stock:number;active:boolean;images:string[];attributes:Record<string,string>;categoryId:string;vendorId:string;category?:Category;vendor?:{id:string;name:string;city:string;zone:string;status?:string};createdAt?:string};
+export type ProductVariant={id:string;productId:string;name:string;priceMinor:number;stock:number;createdAt?:string};
+export type Product={variants:ProductVariant[];reviewStatus:"PENDING"|"APPROVED"|"REJECTED";rejectionReason:string|null;reviewVersion:number;reviewedAt?:string|null;id:string;name:string;slug:string;description:string;priceMinor:number;stock:number;active:boolean;images:string[];attributes:Record<string,string>;categoryId:string;vendorId:string;category?:Category;vendor?:{id:string;name:string;city:string;zone:string;status?:string};createdAt?:string};
 export type ProductPage={items:Product[];total:number;page:number;limit:number};
 export type Address={id:string;kind:string;firstName:string;lastName:string;phone:string;city:string;zone:string;street:string;building:string;apartment:string;directions:string;latitude?:number|null;longitude?:number|null};
 export type Item={productId:string;variantId?:string|null;variantName?:string|null;name:string;quantity:number;unitPriceMinor:number;image?:string};
