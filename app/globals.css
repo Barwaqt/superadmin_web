@@ -60,7 +60,7 @@
 
 /* Product review grid: five cards on laptops, two on smaller screens. */
 @media(min-width:951px){.catalog{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.catalog article{padding:12px}}
-.catalog article{min-width:0;overflow-wrap:anywhere}
+.catalog article{min-width:0;overflow-wrap:anywhere;display:flex;flex-direction:column}.catalog article>.primary{margin-top:auto;align-self:stretch;text-align:center}.catalog article>.pill{align-self:flex-start}
 @media(max-width:950px){.catalog{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Vendor location: pick a service area from Google Maps */
 .location-detect{display:grid;gap:10px;margin:18px 0 6px;padding:14px;border:1px solid #e5eaf0;border-radius:12px;background:#f7fbf9}
