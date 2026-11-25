@@ -1,0 +1,246 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.illustrationWrap {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.illustrationImg {
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.dividerWrap {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px auto 20px;
+}
+
+.dividerSvg {
+  width: 100%;
+  max-width: 428px;
+  height: 18px;
+  display: block;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 10px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #141e23;
+  letter-spacing: -0.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #55dc2a;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.lead {
+  max-width: 460px;
+  color: #5b5f63;
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.urduBadge {
+  background: #eef3f8;
+  color: #5b6b60;
+  border-radius: 9999px;
+  padding: 4px 16px;
+  font-size: 12px;
+  display: inline-block;
+  margin: 0 0 22px;
+  line-height: 1.5;
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', Arial, sans-serif;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 4px 5px 4px 16px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  margin: 0 0 24px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.searchBar:focus-within {
+  border-color: #55dc2a;
+  box-shadow: 0 0 0 3px rgba(85, 220, 42, 0.15), 0 6px 24px -4px rgba(0, 0, 0, 0.06);
+}
+
+.searchIcon {
+  color: #64748b;
+  flex-shrink: 0;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13.5px;
+  color: #1e293b;
+  min-width: 0;
+  padding: 6px 0;
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: #64748b;
+}
+
+.searchBtn {
+  background: #3cd01f;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 7px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+  font-family: inherit;
+}
+
+.searchBtn:hover {
+  background: #34be1a;
+  transform: translateY(-0.5px);
+}
+
+.actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 520px;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.primary {
+  background: #3cd01f;
+  color: #042100;
+  border: 1px solid #27ab11;
+  box-shadow: 0 2px 8px rgba(60, 208, 31, 0.22);
+}
+
+.primary:hover {
+  background: #34be1a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(60, 208, 31, 0.28);
+}
+
+.secondary {
+  background: #ffffff;
+  color: #141e23;
+  border: 1px solid #bdcbb2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.secondary:hover {
+  background: #fbfdf9;
+  border-color: #9cb38c;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .title {
+    font-size: 22px;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+  .lead {
+    font-size: 14px;
+  }
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .primary,
+  .secondary {
+    width: 100%;
+  }
+}
