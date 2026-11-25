@@ -13,6 +13,7 @@ export function useApi<T>(path:string|null){
  return {data:result?.key===key?result.data:undefined,error:result?.key===key?result.error:'',loading:!!path&&result?.key!==key,reload};
 }
 export type Category={commissionBps:number;id:string;name:string;slug:string;image?:string|null;parentSlug?:string|null;productIds?:string[];_count?:{products:number;catalogProducts?:number}};
+export type Brand={id:string;name:string;slug:string;image?:string|null;description:string;createdAt?:string;updatedAt?:string;_count?:{products:number}};
 export type ProductVariant={id:string;productId?:string;name:string;priceMinor:number;compareAtPriceMinor?:number|null;stock:number;image?:string|null;options?:Record<string,string>;createdAt?:string};
 export type Product={variants:ProductVariant[];reviewStatus:"PENDING"|"APPROVED"|"REJECTED";rejectionReason:string|null;reviewVersion:number;reviewedAt?:string|null;id:string;name:string;slug:string;description:string;priceMinor:number;compareAtPriceMinor?:number|null;discountPercent?:number|null;stock:number;active:boolean;images:string[];attributes:Record<string,string>;categoryId:string;vendorId:string;category?:Category;vendor?:{id:string;name:string;city:string;zone:string;status?:string};createdAt?:string};
 export type ProductPage={items:Product[];total:number;page:number;limit:number};
