@@ -86,3 +86,5 @@
 .product-link{background:none;border:0;padding:0;color:#0a7a3d;font:inherit;text-align:left;cursor:pointer}
 .product-link:hover{text-decoration:underline}
 .product-link b{color:inherit}
+.vendor-actions{display:flex;align-items:center;gap:4px;flex-wrap:nowrap}
+.panel .vendor-actions button{margin:0;white-space:nowrap}
